@@ -120,6 +120,10 @@ incidents.
 | "I'll add tests later"                       | In trading, untested code is undeployable code. The test proves the safety property exists. | `trading-tdd`                    |
 | "This exception can't really happen"         | In trading, every exception happens. Network failures, partial fills, stale data, race conditions -- all of them. | `async-reliability`              |
 | "Let me just refactor this quickly"          | Refactoring trading code without understanding the architecture creates duplicate order paths. | `trading-bot-architecture`       |
+| "I'll just use the raw close price"          | Unadjusted prices create phantom gaps from splits/dividends. Every gap calculation needs adjusted close. | `gap-calculation`                |
+| "The sentiment is clearly bullish"           | Sentiment alone has ~52% accuracy. It must pass through confluence gates like any other signal. | `market-sentiment-analyst`       |
+| "The backtest looks great, ship it"          | Without Monte Carlo validation, a great backtest may just be lucky sequencing. | `strategy-optimizer`             |
+| "I'll refactor this legacy code real quick"  | Without characterization tests, you don't know what the code actually does. Lock behavior first. | `characterization-testing`       |
 
 ---
 
@@ -161,6 +165,13 @@ because violating them caused real production incidents.
 | `trading-tdd`                | No production trading code without a failing test first               |
 | `database-safety-for-trading`| Every DB operation handles transaction failure independently          |
 | `async-reliability`          | Every asyncio task has a done_callback. No except:pass. Ever.        |
+| `0dte-risk-management`       | No 0DTE position without automated exit rules                        |
+| `confidence-thresholds`      | No trade without meeting confidence threshold for its risk tier      |
+| `gap-calculation`            | Every gap calculation uses adjusted close prices                     |
+| `backtest-expert`            | Every backtest starts with a written hypothesis                      |
+| `strategy-optimizer`         | If strategy can't survive 10,000 random orderings, it is overfit     |
+| `mcp-broker-integration`    | MCP execution follows the 5-step deterministic loop                  |
+| `characterization-testing`   | Lock behavior before refactoring legacy trading code                 |
 
 **You cannot "flex" a rigid skill.** If the user asks you to skip a risk check,
 you must explain why the iron law exists and propose an alternative.
@@ -180,7 +191,7 @@ These skills provide strong defaults that can be adjusted to context:
 
 ## Skill Finder
 
-For a complete catalog of all 25 skills organized by role, category, and
+For a complete catalog of all 40 skills organized by role, category, and
 common workflows, see:
 
 **`skill-finder.md`** (in this same directory)
@@ -226,6 +237,16 @@ Working with the database?      -> database-safety-for-trading
 Debugging a trading issue?      -> systematic-debugging
 Writing async/concurrent code?  -> async-reliability
 Preparing for live trading?     -> paper-to-live-progression
+Trading 0DTE options?           -> 0dte-risk-management
+Building backtests?             -> backtest-expert
+Stress-testing a strategy?      -> strategy-optimizer
+Adding sentiment signals?       -> market-sentiment-analyst
+Integrating broker via MCP?     -> mcp-broker-integration
+Scaling to microservices?       -> distributed-trading-patterns
+Refactoring legacy code?        -> characterization-testing
+Setting up CLAUDE.md?           -> claude-md-for-trading
+Adding confidence gates?        -> confidence-thresholds
+Calculating market gaps?        -> gap-calculation
 Not sure which skill?           -> skill-finder.md
 ```
 

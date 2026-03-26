@@ -444,6 +444,18 @@ See `cep-adapter-reference.md` in this directory for a complete CEP engine imple
 
 ---
 
+## When to Scale Beyond Single-Process
+
+This skill covers **single-process, local event-driven architecture** — which handles 80% of trading bot use cases. When you outgrow single-process, see the companion skill:
+
+- **More than 5 strategies** running simultaneously
+- **More than 50 symbols** tracked in real-time
+- **Latency requirements below 10ms** end-to-end
+- **Multi-asset, multi-broker** operation
+- **Team of 3+ developers** needing independent deployment
+
+If any of these apply, see `distributed-trading-patterns` for Kafka/NATS event streaming, actor models, microservices decomposition, and distributed kill-switch patterns.
+
 ## Integration
 
 | Scenario                                  | Invoke Skill                           |
@@ -456,6 +468,8 @@ See `cep-adapter-reference.md` in this directory for a complete CEP engine imple
 | Testing the architecture                  | `trading-tdd`                          |
 | Adding market data handling               | `market-data-integrity`               |
 | Deploying the bot                         | `deployment-and-rollback`              |
+| Scaling beyond single-process             | `distributed-trading-patterns`         |
+| Integrating broker via MCP                | `mcp-broker-integration`              |
 
 ---
 

@@ -515,3 +515,11 @@ options_safety:
 - **Same position sizing for 0DTE and 30DTE options**: 0DTE gamma is exponentially higher and requires reduced position sizes.
 - **Credit spread without multiple-of-credit stop**: Percentage stops do not work for credit strategies. Use multiple-of-credit stops.
 - **No defined-risk vs undefined-risk classification**: Different risk profiles need different controls. Classify every options position.
+
+## Integration
+
+- **trading-bot-skills:0dte-risk-management** -- For deep 0DTE-specific mechanics: theta acceleration curves, liquidity degradation, auto-exit proximity rules, SPY vs SPX settlement differences, and expected-value-per-minute calculations. This skill covers general options safety; `0dte-risk-management` covers the specialized 0DTE domain.
+- **trading-bot-skills:risk-management-gates** -- All options risk checks must return `RiskDecision`, never None. Options-specific gates (DTE checks, Greeks limits) integrate into the standard pre-trade risk gate pipeline.
+- **trading-bot-skills:mcp-broker-integration** -- MCP multileg order tools (`preflight_multileg`, `place_multileg_order`) provide deterministic spread execution. Use MCP preflight to validate spread orders before submission.
+- **trading-bot-skills:spy-vix-regime-trading** -- Volatility regime affects options pricing, IV expectations, and appropriate strategy selection. Pin risk analysis for 0DTE near max OI strikes.
+- **trading-bot-skills:eod-liquidation** -- Options positions require EOD management. DTE=0 positions MUST be closed before market close per the auto-exit rules.

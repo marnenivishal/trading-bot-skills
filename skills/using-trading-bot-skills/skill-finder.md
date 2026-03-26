@@ -119,17 +119,58 @@ systematic-debugging
 
 ### "I'm refactoring trading code"
 ```
-trading-bot-architecture
-  -> order-execution-integrity
-    -> trading-tdd (test existing behavior first)
+characterization-testing (lock behavior first!)
+  -> trading-bot-architecture
+    -> order-execution-integrity
+      -> trading-tdd (test existing behavior first)
+      -> async-reliability
+```
+
+### "I'm building a backtesting framework"
+```
+backtest-expert
+  -> strategy-optimizer (Monte Carlo validation)
+    -> backtesting-before-live (go-live requirements)
+    -> gap-calculation (if trading gaps)
+```
+
+### "I'm integrating a broker via MCP"
+```
+mcp-broker-integration
+  -> broker-api-integration
+    -> order-execution-integrity
+    -> risk-management-gates
+```
+
+### "I'm trading 0DTE options"
+```
+0dte-risk-management
+  -> options-trading-safety
+    -> risk-management-gates
+    -> eod-liquidation
+```
+
+### "I'm adding sentiment analysis"
+```
+market-sentiment-analyst
+  -> confidence-thresholds
+    -> strategy-signal-validation
+    -> signal-source-integration
+```
+
+### "I'm scaling to multiple services"
+```
+distributed-trading-patterns
+  -> trading-bot-architecture
     -> async-reliability
+    -> kill-switch-and-circuit-breakers
 ```
 
 ---
 
 ## Complete Skill Map
 
-All 25 skills organized by category.
+All 40 skills organized by category.
 
 ### Core Architecture (3 skills)
 
@@ -139,7 +180,7 @@ All 25 skills organized by category.
 | `order-execution-integrity`  | Dedup, idempotency, reconciliation for every order              | Rigid  |
 | `risk-management-gates`      | Position limits, exposure checks, kill switches                 | Rigid  |
 
-### Strategy & Signals (4 skills)
+### Strategy & Signals (7 skills)
 
 | Skill                        | Description                                                     | Type     |
 |------------------------------|-----------------------------------------------------------------|----------|
@@ -147,6 +188,9 @@ All 25 skills organized by category.
 | `backtesting-before-live`    | Historical validation, walk-forward testing, regime detection   | Flexible |
 | `market-data-integrity`      | Staleness detection, gap handling, feed failover                | Rigid    |
 | `position-sizing-rules`      | Kelly criterion, volatility scaling, correlation adjustments    | Flexible |
+| `backtest-expert`            | Professional backtesting methodology, hypothesis-driven testing | Rigid    |
+| `strategy-optimizer`         | Monte Carlo stress testing, overfitting detection, trade shuffling | Rigid |
+| `market-sentiment-analyst`   | NLP news classification, social feed processing, institutional flow | Flexible |
 
 ### Data & Persistence (3 skills)
 
@@ -164,13 +208,16 @@ All 25 skills organized by category.
 | `websocket-lifecycle`        | Connection management, reconnection, message ordering           | Rigid  |
 | `rate-limiting-and-throttle` | API rate limits, backoff strategies, queue management            | Flexible|
 
-### Risk & Safety (3 skills)
+### Risk & Safety (6 skills)
 
 | Skill                        | Description                                                     | Type   |
 |------------------------------|-----------------------------------------------------------------|--------|
 | `circuit-breaker-patterns`   | Automatic halt on anomalies, cascading failure prevention       | Rigid  |
 | `paper-to-live-progression`  | Environment promotion gates, parity validation                  | Rigid  |
 | `disaster-recovery`          | Position flattening, emergency procedures, data recovery        | Rigid  |
+| `0dte-risk-management`       | 0DTE theta acceleration, liquidity degradation, auto-exit rules | Rigid  |
+| `confidence-thresholds`      | Multi-model ensemble scoring, veto system, risk-tiered gates    | Rigid  |
+| `gap-calculation`            | Adjusted close prices, gap classification, volume validation    | Rigid  |
 
 ### Operations & Deployment (3 skills)
 
@@ -188,13 +235,27 @@ All 25 skills organized by category.
 | `systematic-debugging`       | Structured investigation, hypothesis-driven debugging           | Flexible |
 | `brainstorming`              | Divergent design, option generation, decision matrices          | Flexible |
 
-### Integration & External (3 skills)
+### Integration & External (4 skills)
 
 | Skill                        | Description                                                     | Type     |
 |------------------------------|-----------------------------------------------------------------|----------|
 | `broker-api-integration`     | SDK wrapping, error mapping, partial fill handling              | Rigid    |
 | `notification-systems`       | Alert delivery, escalation chains, dedup of notifications       | Flexible |
 | `logging-for-trading`        | Structured logging, PII redaction, performance impact           | Flexible |
+| `mcp-broker-integration`     | MCP server integration, deterministic execution loop, human-in-the-loop | Rigid |
+
+### Scaling & Distribution (1 skill)
+
+| Skill                          | Description                                                     | Type     |
+|--------------------------------|-----------------------------------------------------------------|----------|
+| `distributed-trading-patterns` | Kafka/NATS event streaming, microservices, distributed kill-switch | Flexible |
+
+### Testing & Quality (2 skills)
+
+| Skill                        | Description                                                     | Type     |
+|------------------------------|-----------------------------------------------------------------|----------|
+| `characterization-testing`   | Lock legacy behavior before refactoring, Michael Feathers technique | Rigid |
+| `claude-md-for-trading`      | CLAUDE.md constitution patterns, hierarchical config, auto-memory | Flexible |
 
 ---
 
@@ -299,3 +360,10 @@ to ensure proper skill loading and chaining.
 | Credential leak                  | `secrets-and-api-key-management` | `logging-for-trading`, `audit-trail-design` |
 | Cascading failures               | `circuit-breaker-patterns`     | `async-reliability`, `disaster-recovery` |
 | Paper-live behavior mismatch     | `paper-to-live-progression`    | `state-reconciliation`, `monitoring-and-alerting` |
+| 0DTE assignment/pin risk         | `0dte-risk-management`         | `options-trading-safety`, `eod-liquidation` |
+| Overfit strategy in production   | `strategy-optimizer`           | `backtest-expert`, `backtesting-before-live` |
+| Low-confidence trade losses      | `confidence-thresholds`        | `strategy-signal-validation`, `risk-management-gates` |
+| Phantom gaps from corporate actions | `gap-calculation`           | `market-data-pipeline`, `indicator-math-verification` |
+| MCP tool hallucination           | `mcp-broker-integration`       | `broker-api-integration`, `order-execution-integrity` |
+| Refactoring breaks trading logic | `characterization-testing`     | `trading-tdd`, `systematic-debugging` |
+| Sentiment manipulation losses    | `market-sentiment-analyst`     | `confidence-thresholds`, `signal-source-integration` |

@@ -371,8 +371,109 @@ Watch for these patterns in code review. Any one of these is a potential fail-op
 - Risk config loaded once at startup with no way to update without restart
 - `except: pass` or `except: continue` anywhere in risk code
 
+## Real-Time Exposure Auditing
+
+Pre-trade risk gates run once per order. But portfolio exposure changes continuously as prices move.
+The risk gate must also support **continuous exposure recalculation** — not just point-in-time checks.
+
+```python
+@dataclass(frozen=True)
+class ExposureSnapshot:
+    """Point-in-time portfolio exposure state."""
+    timestamp: float
+    total_exposure_pct: float  # sum of all positions as % of equity
+    sector_concentrations: dict  # sector -> % of equity
+    correlation_score: float  # 0-1, how correlated current positions are
+    largest_position_pct: float  # single largest position as % of equity
+    unrealized_pnl: float
+
+
+class ExposureAwareRiskGate:
+    """
+    Extends pre-trade risk gate with live exposure context.
+    Recalculates exposure on every order attempt, not just at startup.
+    """
+
+    def __init__(self, config: RiskConfig, portfolio: Portfolio):
+        self.config = config
+        self.portfolio = portfolio
+
+    def check_with_exposure(
+        self, symbol: str, side: str, qty: float, price: float
+    ) -> RiskDecision:
+        try:
+            # Recalculate current exposure NOW, not from cache
+            snapshot = self._compute_exposure_snapshot()
+
+            # Check if adding this trade would breach exposure limits
+            proposed_exposure = snapshot.total_exposure_pct + (
+                qty * price / self.portfolio.equity
+            )
+            if proposed_exposure > self.config.max_total_exposure:
+                return RiskDecision(
+                    allowed=False,
+                    reason=f"total exposure {proposed_exposure:.1%} would exceed "
+                           f"limit {self.config.max_total_exposure:.1%}. "
+                           f"Snapshot: {snapshot}"
+                )
+
+            # Check sector concentration
+            sector = self._get_sector(symbol)
+            sector_exposure = snapshot.sector_concentrations.get(sector, 0.0)
+            if sector_exposure > self.config.max_sector_concentration:
+                return RiskDecision(
+                    allowed=False,
+                    reason=f"sector {sector} at {sector_exposure:.1%} exceeds limit"
+                )
+
+            # Check correlation — highly correlated positions amplify risk
+            if snapshot.correlation_score > self.config.max_correlation:
+                return RiskDecision(
+                    allowed=False,
+                    reason=f"portfolio correlation {snapshot.correlation_score:.2f} "
+                           f"too high for additional position"
+                )
+
+            # Standard pre-trade gate runs AFTER exposure checks pass
+            return pre_trade_risk_gate(
+                symbol, side, qty, price, self.portfolio, self.config
+            )
+        except Exception as e:
+            return RiskDecision(allowed=False, reason=f"exposure check error: {e}")
+```
+
+### Ensemble Confidence Integration
+
+When using multi-model signal validation (see `confidence-thresholds`), the risk gate
+should include the confidence score as an additional check:
+
+```python
+def check_confidence_gate(
+    confidence_score: float,
+    risk_tier: str,
+    thresholds: dict,
+) -> RiskDecision:
+    """Reject trades below the confidence threshold for their risk tier."""
+    try:
+        min_confidence = thresholds.get(risk_tier, 0.85)  # default to strictest
+        if confidence_score < min_confidence:
+            return RiskDecision(
+                allowed=False,
+                reason=f"confidence {confidence_score:.1%} below "
+                       f"{risk_tier} threshold {min_confidence:.1%}"
+            )
+        return RiskDecision(
+            allowed=True,
+            reason=f"confidence {confidence_score:.1%} meets {risk_tier} threshold"
+        )
+    except Exception as e:
+        return RiskDecision(allowed=False, reason=f"confidence gate error: {e}")
+```
+
 ## Integration
 
 - **trading-bot-skills:order-execution-integrity** -- Risk gates must run BEFORE order execution. Order execution must verify risk gate returned `allowed=True`.
 - **trading-bot-skills:kill-switch-and-circuit-breakers** -- Max drawdown and daily loss triggers feed into the kill switch. Kill switch is the last line of defense when risk gates fail.
 - **trading-bot-skills:trailing-stop-mechanics** -- Stop-loss rules here define the initial stop. Trailing stop mechanics handle dynamic adjustment after entry.
+- **trading-bot-skills:confidence-thresholds** -- Ensemble confidence scoring feeds into the risk gate as an additional pre-trade check. Confidence gate runs after signal validation but before position sizing.
+- **trading-bot-skills:0dte-risk-management** -- 0DTE positions require stricter risk gates: reduced position sizes, auto-exit proximity rules, and time-based exposure limits.

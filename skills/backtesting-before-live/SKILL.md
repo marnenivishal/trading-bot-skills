@@ -305,3 +305,11 @@ If this assertion fails, bisect your strategy logic to find which component intr
 - **Perfect equity curve**: Real strategies have drawdowns. Suspiciously smooth curves indicate look-ahead bias or survivorship bias.
 - **No drawdown analysis**: You MUST know the worst case before risking capital.
 - **"The market has changed"**: If your strategy only works in one regime, it is not robust. Fix the strategy, do not blame the market.
+
+## Integration
+
+- **trading-bot-skills:backtest-expert** -- This skill defines the REQUIREMENTS (what must pass before going live). For METHODOLOGY (how to build professional backtests — hypothesis-driven testing, parameter robustness, walk-forward implementation, slippage models), see `backtest-expert`.
+- **trading-bot-skills:strategy-optimizer** -- Monte Carlo stress testing validates that backtest results are robust, not overfit. Trade shuffling and noise injection reveal fragile strategies before they reach paper trading.
+- **trading-bot-skills:paper-to-live-progression** -- After backtesting gates pass, the next stage is paper trading. This skill defines the backtest gate; `paper-to-live-progression` defines the full progression pipeline.
+- **trading-bot-skills:indicator-math-verification** -- Backtest results are only valid if the indicators are correct. Verify all indicator implementations against reference libraries before trusting backtest output.
+- **trading-bot-skills:quantitative-metrics** -- See `docs/quantitative-metrics-reference.md` for canonical metric formulas, correct annualization (Sharpe with N=252 for daily), and common calculation errors.

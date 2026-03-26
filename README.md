@@ -17,7 +17,10 @@ Before any code can handle an error, Claude verifies it returns explicit REJECT,
 10 mandatory test categories: partial fills, race conditions, fail-closed injection, slippage detection, dedup verification, reconciliation, config validation, math correctness, kill switch, and stale data handling. Every test written BEFORE implementation code.
 
 ### Makes You Never Repeat Mistakes
-31 skills trigger automatically. Claude backtests before live, writes fail-closed code, adds done_callbacks to async tasks, and verifies before claiming done.
+40 skills trigger automatically. Claude backtests before live, writes fail-closed code, adds done_callbacks to async tasks, and verifies before claiming done.
+
+### MCP Broker Integration
+Connect Claude directly to brokerage APIs via Model Context Protocol. Deterministic 5-step execution loop with human-in-the-loop approval. No hallucinated prices — every data point from live MCP tools.
 
 ## Quick Start
 
@@ -100,14 +103,22 @@ Skills trigger automatically based on what you're doing. No manual invocation ne
 | "Debug this execution issue" | systematic-debugging → order-execution-integrity |
 | "Ingest Discord/Telegram alerts" | signal-source-integration → strategy-signal-validation |
 | "Flatten positions at EOD" | eod-liquidation |
-| "Trade 0DTE options" | options-trading-safety (0DTE + credit spread gates) |
+| "Trade 0DTE options" | 0dte-risk-management → options-trading-safety |
 | "Check PDT compliance" | broker-api-integration (PDT compliance) |
 | "Set up trade audit trail" | trade-audit-and-replay |
 | "Trade SPY with VIX regime" | spy-vix-regime-trading (ORB, gaps, Rule of 16, flow) |
+| "Build a backtesting framework" | backtest-expert → strategy-optimizer |
+| "Add sentiment analysis" | market-sentiment-analyst → confidence-thresholds |
+| "Integrate broker via MCP" | mcp-broker-integration → broker-api-integration |
+| "Scale to microservices" | distributed-trading-patterns → trading-bot-architecture |
+| "Refactor legacy trading code" | characterization-testing → trading-tdd |
+| "Calculate market gaps" | gap-calculation → indicator-math-verification |
+| "Set up CLAUDE.md for trading" | claude-md-for-trading |
+| "Add confidence gates" | confidence-thresholds → risk-management-gates |
 
-## All 31 Skills
+## All 40 Skills
 
-### Trading Domain Skills (23)
+### Trading Domain Skills (32)
 
 | Skill | What It Does |
 |-------|-------------|
@@ -134,8 +145,28 @@ Skills trigger automatically based on what you're doing. No manual invocation ne
 | **trade-audit-and-replay** | Immutable audit trail, bot-vs-broker comparison, replay engine. |
 | **eod-liquidation** | Scheduled EOD flatten, walk-down limit orders, overnight gap prevention. |
 | **spy-vix-regime-trading** | VIX regime detection, Rule of 16, gap trading, ORB, institutional flow, pin risk. |
+| **0dte-risk-management** | 0DTE theta acceleration, liquidity degradation, auto-exit proximity rules, SPY/SPX settlement. |
+| **confidence-thresholds** | Multi-model ensemble scoring, tiered confidence gates, veto system, confidence decay. |
+| **gap-calculation** | Adjusted close prices, gap classification (institutional vs noise), volume validation. |
+| **backtest-expert** | Hypothesis-driven backtesting, parameter robustness, walk-forward methodology, slippage models. |
+| **strategy-optimizer** | Monte Carlo trade shuffling, noise injection, overfitting detection, parameter discipline. |
+| **market-sentiment-analyst** | NLP news classification, social feed processing, Fed transcript analysis, institutional flow. |
+| **mcp-broker-integration** | MCP server integration, 5-step deterministic execution loop, human-in-the-loop approval. |
+| **distributed-trading-patterns** | Kafka/NATS streaming, actor model, microservices decomposition, distributed kill-switch. |
 
-### Engineering Skills (7)
+### Engineering Skills (8)
+
+| Skill | What It Does |
+|-------|-------------|
+| **using-trading-bot-skills** | Bootstrap: ensures all skills auto-activate when relevant. |
+| **writing-skills** | TDD applied to creating new skills for this plugin. |
+| **brainstorming** | Design before code. Questions before answers. |
+| **writing-plans** | Detailed plans with TDD steps, exact code, exact commands. |
+| **systematic-debugging** | Root cause first. 4 phases. No quick fixes. |
+| **verification-before-completion** | Evidence before claims. Run the command, read the output. |
+| **subagent-driven-development** | Fresh subagent per task with two-stage review. |
+| **characterization-testing** | Lock legacy behavior with characterization tests before refactoring. |
+| **claude-md-for-trading** | CLAUDE.md constitution patterns, hierarchical config, auto-memory. |
 
 | Skill | What It Does |
 |-------|-------------|
@@ -162,6 +193,14 @@ These are hard gates enforced by skills — not suggestions:
 9. **TRAILING STOPS ARE MONOTONIC** — Can only tighten, mathematically proven
 10. **BROKER IS SOURCE OF TRUTH** — Track filled_qty, reconcile continuously
 11. **NO CODE WITHOUT A FAILING TEST FIRST** — TDD with 10 trading-specific categories
+12. **NO 0DTE WITHOUT AUTOMATED EXIT RULES** — Gamma is infinite at expiration
+13. **NO TRADE WITHOUT CONFIDENCE THRESHOLD** — Tiered gates: 60-70% standard, 85% high-stakes
+14. **EVERY GAP USES ADJUSTED CLOSE** — Unadjusted prices produce phantom gaps
+15. **EVERY BACKTEST STARTS WITH A HYPOTHESIS** — "Does this make money?" is not a hypothesis
+16. **10,000 RANDOM ORDERINGS OR OVERFIT** — Monte Carlo trade shuffling is mandatory
+17. **SENTIMENT IS NEVER SOLE DECISION DRIVER** — Must pass validation gates like any signal
+18. **MCP FOLLOWS 5-STEP DETERMINISTIC LOOP** — Discovery, Context, Preflight, Confirmation, Execution
+19. **LOCK BEHAVIOR BEFORE REFACTORING** — Characterization tests before any changes
 
 ## Emabot Failure Coverage
 

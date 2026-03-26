@@ -165,6 +165,54 @@ WantedBy=multi-user.target
 
 ---
 
+## Network Routing Optimization
+
+### BGP Routing Pitfalls
+
+Physical proximity to Alpaca's servers does not guarantee low latency. Suboptimal Border
+Gateway Protocol (BGP) paths can route packets through intermediate cities, turning a
+sub-millisecond hop into 15ms+.
+
+**Documented issue:** Traffic originating near Ashburn, VA has been observed routing through
+Atlanta or Chicago before reaching Alpaca's trading servers, adding 15-17ms of unnecessary
+latency.
+
+**Diagnosis:** Use traceroute to verify the actual path to Alpaca endpoints:
+
+```bash
+# Verify routing to Alpaca market data server
+traceroute 34.145.195.91
+
+# Look for unexpected geographic hops — city names in reverse DNS
+# Bad: ashburn -> atlanta -> chicago -> ashburn (17ms added)
+# Good: ashburn -> ashburn (< 1ms)
+
+# Run during market hours when routing tables may differ from off-hours
+```
+
+### Dedicated Network Paths
+
+For production trading bots, bypass the public internet entirely:
+
+| Option | Provider | Effect | Cost |
+|---|---|---|---|
+| AWS Direct Connect | AWS | Private link from your VPS to GCP/exchanges | $0.03-0.09/GB + port fee |
+| Google Cloud Interconnect | GCP | Dedicated connection to Alpaca's GCP infrastructure | Partner-dependent |
+| Cross-connect (colo) | Equinix | Physical cable in same data center as Alpaca data servers | $200-500/mo |
+
+These eliminate BGP variability and reduce jitter, which matters more than raw latency for
+consistent execution.
+
+### Best Non-GCP Alternative
+
+If you're not on GCP, **AWS us-east-1 (North Virginia)** is the best alternative:
+- ~1-3ms to Alpaca trading servers (GCP us-east4 is also in Ashburn)
+- Favorable peering between AWS and GCP in Virginia
+- Avoids inter-region data transfer costs
+- AWS Direct Connect available for dedicated path
+
+---
+
 ## CPU Contention: The Hidden Risk
 
 ### The Problem

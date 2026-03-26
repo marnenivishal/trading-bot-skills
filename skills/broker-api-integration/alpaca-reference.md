@@ -271,6 +271,104 @@ async def on_trade_update(data):
 
 ---
 
+## Latency Optimization
+
+### Bifurcated Server Architecture
+
+Alpaca's infrastructure is split across two locations. Your deployment strategy must account for both.
+
+| Component | Location | Hosting | Handles |
+|---|---|---|---|
+| Trading servers | Ashburn, VA | GCP us-east4 | Orders, portfolio, authentication |
+| Market data servers | Secaucus, NJ | Equinix NY5 | Real-time quotes, trades, SIP feed |
+
+**Implication:** Hosting your execution engine in Ashburn, VA (or GCP us-east4) minimizes
+latency to trading endpoints. For data ingestion, proximity to Secaucus/NJ is optimal.
+If you must pick one location, prioritize the trading server — order execution latency
+matters more than data reception latency for most strategies.
+
+| Your Server Location | Latency to Trading (Ashburn) | Latency to Data (Secaucus) |
+|---|---|---|
+| GCP us-east4 (Ashburn) | < 1 ms | 3-5 ms |
+| AWS us-east-1 (Virginia) | 1-3 ms | 3-7 ms |
+| Northern NJ | 3-5 ms | 1-5 ms |
+| Chicago | 15-20 ms | 15-20 ms |
+| London | 70-80 ms | 70-80 ms |
+
+### MessagePack Serialization
+
+Alpaca's WebSocket supports both JSON and MessagePack (binary) serialization. MessagePack
+reduces payload size and lowers CPU overhead for serialization/deserialization.
+
+```python
+import msgpack
+
+# When connecting to the WebSocket, request msgpack format
+# Trade update messages arrive as binary frames when using msgpack
+def parse_ws_message(raw_message: bytes) -> dict:
+    """Parse WebSocket message — handle both text (JSON) and binary (msgpack)."""
+    if isinstance(raw_message, bytes):
+        return msgpack.unpackb(raw_message, raw=False)
+    return json.loads(raw_message)
+```
+
+**When to use:** If your bot processes high-volume data streams (multi-symbol quotes),
+MessagePack reduces parsing time. For low-frequency strategies (< 10 symbols), JSON is
+fine and easier to debug.
+
+### Connection Pooling for REST Calls
+
+Each REST call without a persistent session creates a new TCP connection + SSL handshake.
+Use `requests.Session` with `HTTPAdapter` to reuse connections.
+
+```python
+import requests
+from requests.adapters import HTTPAdapter
+
+session = requests.Session()
+adapter = HTTPAdapter(
+    pool_connections=10,     # number of connection pools
+    pool_maxsize=100,        # max connections per pool — match your thread count
+    max_retries=0,           # handle retries yourself via circuit breaker
+)
+session.mount("https://", adapter)
+
+# All requests through this session reuse connections
+response = session.get(
+    "https://paper-api.alpaca.markets/v2/account",
+    headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret},
+    timeout=5.0,
+)
+```
+
+**Critical:** If your bot uses 100 threads but `pool_maxsize=10`, 90 threads block waiting
+for connections. Set `pool_maxsize >= thread_count`.
+
+### Slow Consumer Detection
+
+If your bot processes WebSocket messages slower than they arrive, the server buffers them.
+Eventually: disconnection or stale data delivered minutes late.
+
+**Detection:** Monitor the delta between the message's internal `timestamp` field and your
+local receipt time. A delta exceeding 25ms during normal trading indicates a processing
+bottleneck.
+
+**Keep-alive:** Send pong frames at least every 20 seconds. Alpaca will disconnect idle
+connections. The `alpaca-py` SDK handles this, but if using raw WebSocket connections,
+implement it explicitly.
+
+```python
+import asyncio
+
+async def keep_alive(ws, interval=15):
+    """Send pong every 15s to prevent timeout disconnection."""
+    while True:
+        await asyncio.sleep(interval)
+        await ws.pong()
+```
+
+---
+
 ## Common Pitfalls
 
 ### 1. Rate Limits

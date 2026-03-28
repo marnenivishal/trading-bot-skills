@@ -1,8 +1,22 @@
 # Feature Index
 
-All 41 skills in the trading-bot-skills plugin, organized by category.
+All 53 skills in the trading-bot-skills plugin, organized by category.
 
 ---
+
+## Data Handling & Defensive Programming
+
+| Skill | Description |
+|---|---|
+| [falsy-zero-and-sentinel-values](../skills/falsy-zero-and-sentinel-values/SKILL.md) | Numeric falsy-zero traps, sentinel value design, explicit None checks |
+| [timestamp-and-timezone-in-trading](../skills/timestamp-and-timezone-in-trading/SKILL.md) | UTC storage, ET trading logic, DST handling, ZoneInfo patterns |
+
+## Signal Ingestion Pipeline
+
+| Skill | Description |
+|---|---|
+| [chrome-extension-signal-bridge](../skills/chrome-extension-signal-bridge/SKILL.md) | Browser-to-backend signal transport, IndexedDB queuing, offline retry |
+| [chat-signal-parsing-and-dedup](../skills/chat-signal-parsing-and-dedup/SKILL.md) | Multi-layer dedup, content hashing, signal tier routing, username normalization |
 
 ## Risk Management
 
@@ -62,8 +76,11 @@ All 41 skills in the trading-bot-skills plugin, organized by category.
 | [trading-bot-architecture](../skills/trading-bot-architecture/SKILL.md) | Bot scaffolding, restructuring monoliths, separation of concerns |
 | [distributed-trading-patterns](../skills/distributed-trading-patterns/SKILL.md) | Kafka/NATS event streaming, microservices, multi-bot coordination |
 | [database-safety-for-trading](../skills/database-safety-for-trading/SKILL.md) | Transaction safety, stale data prevention, position persistence |
+| [database-transaction-patterns](../skills/database-transaction-patterns/SKILL.md) | SAVEPOINT patterns, InFailedSqlTransaction, transaction poisoning prevention |
 | [trading-config-management](../skills/trading-config-management/SKILL.md) | Configuration across environments, preventing config drift |
 | [async-reliability](../skills/async-reliability/SKILL.md) | Asyncio tasks, silent failures, concurrent code in trading systems |
+| [multi-engine-coordination](../skills/multi-engine-coordination/SKILL.md) | Cross-strategy dedup, unified position table, engine lifecycle |
+| [docker-and-scraper-reliability](../skills/docker-and-scraper-reliability/SKILL.md) | Playwright in Docker, Cloudflare circuit breaker, scraper watchdog |
 
 ## Monitoring & Audit
 
@@ -72,6 +89,21 @@ All 41 skills in the trading-bot-skills plugin, organized by category.
 | [trading-monitoring-and-alerts](../skills/trading-monitoring-and-alerts/SKILL.md) | Dashboards, alerting, health checks, audit trails |
 | [trade-audit-and-replay](../skills/trade-audit-and-replay/SKILL.md) | Trade logging, replay validation, bot-vs-broker reconciliation |
 | [position-reconciliation](../skills/position-reconciliation/SKILL.md) | Position tracking, local-vs-broker mismatch detection, EOD reconciliation |
+| [pnl-calculation-and-reconciliation](../skills/pnl-calculation-and-reconciliation/SKILL.md) | P&L accuracy, partial fills, contract multipliers, broker reconciliation |
+| [audit-trail-and-forensic-analysis](../skills/audit-trail-and-forensic-analysis/SKILL.md) | Deterministic audit rules, 5-zone model, health scoring, forensic cross-checks |
+
+## AI & Learning
+
+| Skill | Description |
+|---|---|
+| [llm-integration-for-trading-bots](../skills/llm-integration-for-trading-bots/SKILL.md) | LLM response parsing, provider fallback chains, cost tracking, schema validation |
+| [self-tuning-and-learning-systems](../skills/self-tuning-and-learning-systems/SKILL.md) | Feedback loop prevention, knowledge hierarchies, locked parameters, auto-rollback |
+
+## Dashboard & UI
+
+| Skill | Description |
+|---|---|
+| [streamlit-dashboard-patterns](../skills/streamlit-dashboard-patterns/SKILL.md) | Session state vs cache vs DB, widget clearing, live data patterns |
 
 ## Workflow & Process
 

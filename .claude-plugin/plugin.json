@@ -1,7 +1,7 @@
 {
   "name": "trading-bot-skills",
   "description": "Claude Code skills for building reliable day trading bots: event-driven architecture, order execution integrity, position reconciliation, risk management, market data pipelines, backtesting, and fail-closed engineering practices. Encodes hard-won lessons from production trading bot failures.",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": {
     "name": "Vishal"
   },

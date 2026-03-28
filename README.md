@@ -8,7 +8,7 @@
 ## Why Trading Bot Skills?
 
 ### Knows Every Failure Mode
-Claude understands ghost positions, transaction poisoning, stop-loss slippage, sentinel value traps, and 11 more failure classes. Because they all happened in production.
+Claude understands ghost positions, transaction poisoning, stop-loss slippage, sentinel value traps, feedback loop poison, P&L double-counting, and 21 more failure classes. Because they all happened in production.
 
 ### Enforces Fail-Closed
 Before any code can handle an error, Claude verifies it returns explicit REJECT, never None. It's a hard gate, not a suggestion.
@@ -17,7 +17,7 @@ Before any code can handle an error, Claude verifies it returns explicit REJECT,
 10 mandatory test categories: partial fills, race conditions, fail-closed injection, slippage detection, dedup verification, reconciliation, config validation, math correctness, kill switch, and stale data handling. Every test written BEFORE implementation code.
 
 ### Makes You Never Repeat Mistakes
-40 skills trigger automatically. Claude backtests before live, writes fail-closed code, adds done_callbacks to async tasks, and verifies before claiming done.
+53 skills trigger automatically. Claude backtests before live, writes fail-closed code, adds done_callbacks to async tasks, and verifies before claiming done.
 
 ### MCP Broker Integration
 Connect Claude directly to brokerage APIs via Model Context Protocol. Deterministic 5-step execution loop with human-in-the-loop approval. No hallucinated prices — every data point from live MCP tools.
@@ -114,11 +114,23 @@ Skills trigger automatically based on what you're doing. No manual invocation ne
 | "Refactor legacy trading code" | characterization-testing → trading-tdd |
 | "Calculate market gaps" | gap-calculation → indicator-math-verification |
 | "Set up CLAUDE.md for trading" | claude-md-for-trading |
+| "Handle VIX=0 or missing data" | falsy-zero-and-sentinel-values |
+| "Fix timezone/DST issues" | timestamp-and-timezone-in-trading |
+| "Build Chrome extension for signals" | chrome-extension-signal-bridge |
+| "Deduplicate chat signals" | chat-signal-parsing-and-dedup |
+| "Fix InFailedSqlTransaction" | database-transaction-patterns |
+| "Deploy scraper in Docker" | docker-and-scraper-reliability |
+| "Calculate P&L correctly" | pnl-calculation-and-reconciliation |
+| "Run multiple strategies together" | multi-engine-coordination |
+| "Integrate Gemini/OpenAI" | llm-integration-for-trading-bots |
+| "Build Streamlit trading dashboard" | streamlit-dashboard-patterns |
+| "Add self-tuning/learning" | self-tuning-and-learning-systems |
+| "Implement audit rules" | audit-trail-and-forensic-analysis |
 | "Add confidence gates" | confidence-thresholds → risk-management-gates |
 
-## All 40 Skills
+## All 53 Skills
 
-### Trading Domain Skills (32)
+### Trading Domain Skills (44)
 
 | Skill | What It Does |
 |-------|-------------|
@@ -153,8 +165,20 @@ Skills trigger automatically based on what you're doing. No manual invocation ne
 | **market-sentiment-analyst** | NLP news classification, social feed processing, Fed transcript analysis, institutional flow. |
 | **mcp-broker-integration** | MCP server integration, 5-step deterministic execution loop, human-in-the-loop approval. |
 | **distributed-trading-patterns** | Kafka/NATS streaming, actor model, microservices decomposition, distributed kill-switch. |
+| **falsy-zero-and-sentinel-values** | Explicit None checks for numeric data. Zero is valid — `or 0` is a bug. Fail-closed sentinels. |
+| **timestamp-and-timezone-in-trading** | UTC storage, ET trading logic, ZoneInfo over pytz, DST-safe market hours, cache deserialization. |
+| **chrome-extension-signal-bridge** | IndexedDB offline queue, content-hash dedup, MV3 service worker lifecycle, heartbeat, fallback chain. |
+| **chat-signal-parsing-and-dedup** | 3-layer dedup (browser→server→DB), signal tier routing, username normalization, unified cooldown. |
+| **database-transaction-patterns** | SAVEPOINT isolation, InFailedSqlTransaction prevention, UPDATE WHERE status guards, pool recovery. |
+| **docker-and-scraper-reliability** | Playwright Docker setup, Cloudflare circuit breaker, session persistence, scraper watchdog, fallback chain. |
+| **pnl-calculation-and-reconciliation** | Broker equity as truth, options x100 multiplier, partial fill cost basis, 4-table UNION dedup. |
+| **multi-engine-coordination** | Unified position table, cross-engine dedup gate, global cooldown, nanosecond order IDs, engine registry. |
+| **llm-integration-for-trading-bots** | Safe JSON extraction, provider fallback chain, model version pinning, cost tracking, schema validation. |
+| **streamlit-dashboard-patterns** | 3-tier state model, live data without cache, widget clearing, datetime deserialization, URL state sync. |
+| **self-tuning-and-learning-systems** | Feedback loop poison detection, 3-tier knowledge hierarchy, locked parameters, consensus validation. |
+| **audit-trail-and-forensic-analysis** | 5-zone audit model, severity tiers with CRITICAL veto, broker forensic cross-check, rule sunset policy. |
 
-### Engineering Skills (8)
+### Engineering Skills (9)
 
 | Skill | What It Does |
 |-------|-------------|
@@ -178,7 +202,7 @@ Skills trigger automatically based on what you're doing. No manual invocation ne
 | **verification-before-completion** | Evidence before claims. Run the command, read the output. |
 | **subagent-driven-development** | Fresh subagent per task with two-stage review. |
 
-## The 11 Iron Laws
+## The Iron Laws
 
 These are hard gates enforced by skills — not suggestions:
 
@@ -201,6 +225,15 @@ These are hard gates enforced by skills — not suggestions:
 17. **SENTIMENT IS NEVER SOLE DECISION DRIVER** — Must pass validation gates like any signal
 18. **MCP FOLLOWS 5-STEP DETERMINISTIC LOOP** — Discovery, Context, Preflight, Confirmation, Execution
 19. **LOCK BEHAVIOR BEFORE REFACTORING** — Characterization tests before any changes
+20. **NEVER USE `value or default` ON NUMERIC TRADING DATA** — Zero is valid; use `if value is None`
+21. **STORE UTC, TRADE IN ET, DISPLAY IN USER TZ** — No naive datetimes, no hardcoded offsets
+22. **DEDUP AT EVERY LAYER** — Browser, webhook, AND database dedup; any single layer can fail
+23. **A FAILED QUERY POISONS THE ENTIRE TRANSACTION** — Use SAVEPOINT or separate connection
+24. **BROKER EQUITY IS TRUTH** — DB P&L is approximation; when they disagree, broker wins
+25. **ONE POSITION TABLE, ONE DEDUP GATE** — All engines check same state; no per-engine cooldowns
+26. **LLM RESPONSE IS UNTRUSTED INPUT** — Parse defensively; never let parsing failure block a trade
+27. **FEEDBACK LOOPS NEED POISON DETECTION** — System learning from own bad trades amplifies worst tendencies
+28. **AUDIT RULES MUST BE DETERMINISTIC** — Max 10 per zone, severity-ranked, with CRITICAL veto
 
 ## Emabot Failure Coverage
 
@@ -223,6 +256,18 @@ Every skill exists because of a real production failure:
 | Fail-Open | Exceptions bypassing all safety gates | risk-management-gates |
 | Complexity Explosion | 58 audit rules creating noise | trading-monitoring-and-alerts |
 | EMA Curl Noise | False signals from 5-bar lookback | strategy-signal-validation |
+| Falsy-Zero VIX | VIX=0 treated as missing, triggered 99.0 sentinel | falsy-zero-and-sentinel-values |
+| Timezone DST | Hardcoded UTC-5 wrong during EDT | timestamp-and-timezone-in-trading |
+| Chat Signal Dedup | Same signal processed 3x — single dedup layer | chat-signal-parsing-and-dedup |
+| Transaction Cascade | InFailedSqlTransaction from nested query failure | database-transaction-patterns |
+| P&L Double-Count | 4-table aggregation without dedup key | pnl-calculation-and-reconciliation |
+| Multi-Engine Dupe | SPY entered 11x from 4 independent engines | multi-engine-coordination |
+| LLM Parsing | 129 Gemini truncated JSON failures | llm-integration-for-trading-bots |
+| Streamlit Cache | Stale position data from @st.cache_data | streamlit-dashboard-patterns |
+| Extension Signal Loss | No offline queue — signals lost on network failure | chrome-extension-signal-bridge |
+| Scraper Hang | Playwright hung 30+ min, appeared healthy | docker-and-scraper-reliability |
+| Feedback Loop Poison | AI learned from own bad trades, amplified losses | self-tuning-and-learning-systems |
+| Audit Explosion | 66 rules, alert fatigue, non-deterministic results | audit-trail-and-forensic-analysis |
 
 ## Tutorial: Your First Trading Bot Feature
 

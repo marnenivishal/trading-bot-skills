@@ -1,5 +1,52 @@
 # Changelog
 
+## v3.0.0 (2026-03-28)
+
+### New Skills (12) — Emabot Deep Lessons Extraction
+
+Comprehensive analysis of 611 commits from the emabot production trading bot, extracting hard-won lessons into reusable skills.
+
+**Data Handling & Defensive Programming:**
+- **falsy-zero-and-sentinel-values** — Python's `or 0` trap: VIX=0.0 treated as missing (13+ commits). Explicit None checks, fail-closed sentinels (99.0 for VIX, -99999.0 for equity).
+- **timestamp-and-timezone-in-trading** — UTC storage, ET trading logic, ZoneInfo over pytz (25+ commits). DST transition bugs, `.dt` accessor crashes, Streamlit cache datetime deserialization.
+
+**Signal Ingestion Pipeline:**
+- **chrome-extension-signal-bridge** — Browser signal capture with IndexedDB offline queue (3 extension versions). MV3 service worker lifecycle, content-hash dedup, heartbeat, fallback chain.
+- **chat-signal-parsing-and-dedup** — 3-layer dedup (browser→server→DB), signal tier routing (10+ commits). Username normalization, 5-min window hashing, unified cooldown across all engines.
+
+**Architecture & Infrastructure:**
+- **database-transaction-patterns** — InFailedSqlTransaction prevention (22+ commits). SAVEPOINT isolation, separate connections for risky sub-queries, UPDATE WHERE status guards, pool recovery.
+- **docker-and-scraper-reliability** — Playwright Docker setup, Cloudflare circuit breaker. Scraper hung 30+ minutes undetected. Session persistence, memory limits, fallback chain.
+- **multi-engine-coordination** — SPY entered 11x from 4 independent engines (24+ commits). Unified position table, cross-engine dedup, global cooldown, nanosecond client_order_id.
+
+**Monitoring & Audit:**
+- **pnl-calculation-and-reconciliation** — Broker equity as truth (28+ commits). Options x100 multiplier missing, 4-table UNION with dedup, partial fill cost basis, ghost position worst-case P&L.
+- **audit-trail-and-forensic-analysis** — 66 audit rules grew organically causing alert fatigue. 5-zone model, severity tiers with CRITICAL veto, deterministic rules, broker-vs-DB forensic cross-checks.
+
+**AI & Learning:**
+- **llm-integration-for-trading-bots** — 129 Gemini JSON parsing failures (20+ commits). Safe extraction, provider fallback chain, model version pinning, cost tracking with budget circuit breaker.
+- **self-tuning-and-learning-systems** — Feedback loop poison: AI recommended "be more aggressive" after losses (17+ commits). 3-tier knowledge hierarchy, locked parameters, consensus validation, auto-rollback.
+
+**Dashboard & UI:**
+- **streamlit-dashboard-patterns** — 15+ UI bugs from state management (9+ commits). 3-tier state model, live data without cache, widget clearing, datetime deserialization after cache.
+
+### Updated Docs
+- **docs/emabot-postmortem.md** — Expanded from 15 to 27 production failures with full coverage matrix
+- **docs/feature-index.md** — Updated from 41 to 53 skills with new categories
+
+### New Iron Laws (9)
+- **NEVER USE `value or default` ON NUMERIC TRADING DATA** — Zero is valid
+- **STORE UTC, TRADE IN ET, DISPLAY IN USER TZ** — No naive datetimes
+- **DEDUP AT EVERY LAYER** — Browser, webhook, AND database
+- **A FAILED QUERY POISONS THE ENTIRE TRANSACTION** — Use SAVEPOINT
+- **BROKER EQUITY IS TRUTH** — DB P&L is approximation
+- **ONE POSITION TABLE, ONE DEDUP GATE** — All engines check same state
+- **LLM RESPONSE IS UNTRUSTED INPUT** — Parse defensively
+- **FEEDBACK LOOPS NEED POISON DETECTION** — Lock core parameters
+- **AUDIT RULES MUST BE DETERMINISTIC** — Max 10 per zone
+
+---
+
 ## v2.0.0 (2026-03-25)
 
 ### New Skills (9)

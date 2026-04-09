@@ -175,6 +175,16 @@ ibkr-session-watchdog              -- triage: subscriptions, sessions, data line
   -> ibkr-api-edge-cases            -- if all 4 layers pass and it's actually a code issue
 ```
 
+### "I'm getting an IBKR error code or rejection"
+```
+ibkr-api-troubleshooter            -- classify error domain, get resolution steps
+  -> ibkr-market-data-subscriptions -- if Market Data domain (10168, 10089, 354)
+  -> ibkr-session-watchdog          -- if Session domain (10197, NaN data)
+  -> ibkr-api-edge-cases            -- if Pacing domain (162) or reconnection (502, 504)
+  -> ibkr-gateway-docker            -- if Docker/connection errors (10141)
+  -> ibkr-risk-officer              -- if Permission/Risk domain (201)
+```
+
 ### "I'm building an IBKR trading bot"
 ```
 ibkr-bot-architect                 -- architecture, permissions, prerequisites
@@ -189,7 +199,7 @@ ibkr-bot-architect                 -- architecture, permissions, prerequisites
 
 ## Complete Skill Map
 
-All 46 skills organized by category.
+All 47 skills organized by category.
 
 ### Core Architecture (3 skills)
 
@@ -273,6 +283,7 @@ All 46 skills organized by category.
 | `ibkr-api-edge-cases`            | Order IDs, brackets, reconnection, historical data pacing       | Rigid    |
 | `ibkr-risk-officer`              | Pre-trade gatekeeper: order size, permissions, options levels   | Rigid    |
 | `ibkr-session-watchdog`          | Runtime triage: NaN quotes, session conflicts, data-line limits | Rigid    |
+| `ibkr-api-troubleshooter`        | Error code classification, contract/permission/risk resolution  | Rigid    |
 
 ### Scaling & Distribution (1 skill)
 
@@ -400,3 +411,4 @@ to ensure proper skill loading and chaining.
 | NaN quotes / missing IBKR data   | `ibkr-session-watchdog`        | `ibkr-market-data-subscriptions`, `ibkr-bot-architect` |
 | IBKR session conflicts            | `ibkr-session-watchdog`        | `ibkr-bot-architect`, `ibkr-gateway-docker` |
 | IBKR API connection failures      | `ibkr-api-edge-cases`          | `ibkr-gateway-docker`, `ibkr-session-watchdog` |
+| IBKR error codes / order rejections | `ibkr-api-troubleshooter`      | `ibkr-api-edge-cases`, `ibkr-risk-officer` |

@@ -1,6 +1,6 @@
 # Feature Index
 
-All 59 skills in the trading-bot-skills plugin, organized by category.
+All 60 skills in the trading-bot-skills plugin, organized by category.
 
 ---
 
@@ -115,6 +115,7 @@ All 59 skills in the trading-bot-skills plugin, organized by category.
 | [ibkr-api-edge-cases](../skills/ibkr-api-edge-cases/SKILL.md) | Order ID management, bracket orders, reconnection, historical data pacing |
 | [ibkr-risk-officer](../skills/ibkr-risk-officer/SKILL.md) | Pre-trade gatekeeper: order size, permissions, options level compliance |
 | [ibkr-session-watchdog](../skills/ibkr-session-watchdog/SKILL.md) | Diagnoses NaN quotes, session conflicts, data-line exhaustion, missing subscriptions |
+| [ibkr-api-troubleshooter](../skills/ibkr-api-troubleshooter/SKILL.md) | Error code classification, contract/permission/risk/session resolution steps |
 
 ## Workflow & Process
 

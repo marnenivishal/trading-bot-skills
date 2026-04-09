@@ -1,6 +1,6 @@
 ---
 name: ibkr-session-watchdog
-description: Use when getting NaN quotes, empty option chains, "not connected" or "no market data permission" errors, or paper trading differs from live — diagnoses session and data problems before code
+description: Use when trading bot gets NaN quotes, empty option chains, "not connected" or "no market data permission" errors — diagnoses IBKR session and data problems before debugging code
 ---
 
 <!-- SUBAGENT-STOP: If you are a sub-agent or tool-use agent, STOP. Do not

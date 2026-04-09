@@ -477,3 +477,4 @@ def check_confidence_gate(
 - **trading-bot-skills:trailing-stop-mechanics** -- Stop-loss rules here define the initial stop. Trailing stop mechanics handle dynamic adjustment after entry.
 - **trading-bot-skills:confidence-thresholds** -- Ensemble confidence scoring feeds into the risk gate as an additional pre-trade check. Confidence gate runs after signal validation but before position sizing.
 - **trading-bot-skills:0dte-risk-management** -- 0DTE positions require stricter risk gates: reduced position sizes, auto-exit proximity rules, and time-based exposure limits.
+- **trading-bot-skills:trading-code-reviewer** -- After modifying risk gates, run the multi-agent review supervisor. Risk gate changes require dual-agent agreement (Order Safety + Strategy agents) to ensure gates are tightened, never loosened.

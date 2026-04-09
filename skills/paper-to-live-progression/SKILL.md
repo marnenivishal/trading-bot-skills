@@ -262,3 +262,7 @@ Examples of structural issues:
 - **Resuming after rollback without root cause fix**: The problem WILL recur. Fix first.
 - **Live-tuning parameters**: All parameter changes go through backtest first. No exceptions.
 - **"Just this once" exceptions to any gate**: Gates exist because past failures demanded them. Respect them.
+
+## Pre-Live Code Review Gate
+
+Before progressing from paper to live, invoke the **trading-code-reviewer** skill for a full multi-agent review of all order construction, risk management, and error handling code. This is a mandatory gate — no code goes live without dual-agent agreement that order safety and risk controls are correct.

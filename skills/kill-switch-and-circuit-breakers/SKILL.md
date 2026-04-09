@@ -575,3 +575,4 @@ def manual_kill_switch_cli():
 - **trading-bot-skills:async-reliability** -- Async code has unique failure modes (hung awaits,
   unhandled task exceptions, event loop death) that the watchdog must detect via heartbeat
   monitoring. The circuit breaker pattern applies to all async broker API calls.
+- **trading-bot-skills:trading-code-reviewer** -- Kill switch and circuit breaker changes are safety-critical. Run the multi-agent review to ensure changes don't weaken emergency stop behavior. The Robustness agent and Order Safety agent must both agree.

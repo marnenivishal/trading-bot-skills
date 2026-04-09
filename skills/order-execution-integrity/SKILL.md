@@ -559,3 +559,4 @@ if not result.allowed:
 - **trading-bot-skills:broker-api-integration** -- This skill defines WHAT to track; broker-api-integration defines HOW to communicate with the broker. Fill events flow from broker-api-integration into the handlers defined here.
 - **trading-bot-skills:position-reconciliation** -- Even with perfect fill tracking, drift happens. Position reconciliation is the safety net that catches any discrepancy between local tracking and broker truth.
 - **trading-bot-skills:risk-management-gates** -- Risk gates (max position size, max portfolio exposure, daily loss limits) should be checked AFTER dedup but BEFORE order submission.
+- **trading-bot-skills:trading-code-reviewer** -- After implementing order execution changes, run the multi-agent review supervisor to verify order safety with dual-agent agreement before merging.

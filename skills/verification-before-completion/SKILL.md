@@ -236,3 +236,7 @@ git merge --no-commit --no-ff origin/main && git merge --abort
 - **Skipping the trading verification checklist**: Every checklist item exists because a bug was once deployed that it would have caught.
 - **Committing without running `git diff --staged`**: Review what you are actually committing.
 - **"It works on my machine"**: Run tests in the CI environment or equivalent. Environment differences cause bugs.
+
+## Multi-Agent Review for Trading Code
+
+For trading bot changes that touch order logic, risk controls, or signal processing, invoke the **trading-code-reviewer** skill before claiming completion. This runs a structured 5-agent review requiring dual agreement on all findings. Standard verification catches "does it work?" — the trading review catches "could it lose money?"

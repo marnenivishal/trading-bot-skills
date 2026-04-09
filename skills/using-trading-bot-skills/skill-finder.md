@@ -166,11 +166,30 @@ distributed-trading-patterns
     -> kill-switch-and-circuit-breakers
 ```
 
+### "I'm getting NaN / no data from IBKR"
+```
+ibkr-session-watchdog              -- triage: subscriptions, sessions, data lines, API
+  -> ibkr-market-data-subscriptions -- if Layer 1 (subscription) is the problem
+  -> ibkr-bot-architect             -- if Layer 2 (session/permissions) needs redesign
+  -> ibkr-gateway-docker            -- if Layer 4 (Docker/connection) is the problem
+  -> ibkr-api-edge-cases            -- if all 4 layers pass and it's actually a code issue
+```
+
+### "I'm building an IBKR trading bot"
+```
+ibkr-bot-architect                 -- architecture, permissions, prerequisites
+  -> ibkr-market-data-subscriptions -- verify data entitlements
+  -> ibkr-gateway-docker            -- Docker deployment setup
+  -> ibkr-api-edge-cases            -- API patterns (order IDs, brackets, pacing)
+  -> ibkr-risk-officer              -- pre-trade risk validation
+  -> ibkr-session-watchdog          -- runtime data/session diagnostics
+```
+
 ---
 
 ## Complete Skill Map
 
-All 40 skills organized by category.
+All 46 skills organized by category.
 
 ### Core Architecture (3 skills)
 
@@ -243,6 +262,17 @@ All 40 skills organized by category.
 | `notification-systems`       | Alert delivery, escalation chains, dedup of notifications       | Flexible |
 | `logging-for-trading`        | Structured logging, PII redaction, performance impact           | Flexible |
 | `mcp-broker-integration`     | MCP server integration, deterministic execution loop, human-in-the-loop | Rigid |
+
+### IBKR (Interactive Brokers) (6 skills)
+
+| Skill                            | Description                                                     | Type     |
+|----------------------------------|-----------------------------------------------------------------|----------|
+| `ibkr-bot-architect`             | Bot design framework: permissions, sessions, API choices        | Flexible |
+| `ibkr-market-data-subscriptions` | Subscription coverage, TWS-only vs API-enabled bundles          | Rigid    |
+| `ibkr-gateway-docker`            | Docker deployment, port mapping, IBC config, ib_insync          | Rigid    |
+| `ibkr-api-edge-cases`            | Order IDs, brackets, reconnection, historical data pacing       | Rigid    |
+| `ibkr-risk-officer`              | Pre-trade gatekeeper: order size, permissions, options levels   | Rigid    |
+| `ibkr-session-watchdog`          | Runtime triage: NaN quotes, session conflicts, data-line limits | Rigid    |
 
 ### Scaling & Distribution (1 skill)
 
@@ -367,3 +397,6 @@ to ensure proper skill loading and chaining.
 | MCP tool hallucination           | `mcp-broker-integration`       | `broker-api-integration`, `order-execution-integrity` |
 | Refactoring breaks trading logic | `characterization-testing`     | `trading-tdd`, `systematic-debugging` |
 | Sentiment manipulation losses    | `market-sentiment-analyst`     | `confidence-thresholds`, `signal-source-integration` |
+| NaN quotes / missing IBKR data   | `ibkr-session-watchdog`        | `ibkr-market-data-subscriptions`, `ibkr-bot-architect` |
+| IBKR session conflicts            | `ibkr-session-watchdog`        | `ibkr-bot-architect`, `ibkr-gateway-docker` |
+| IBKR API connection failures      | `ibkr-api-edge-cases`          | `ibkr-gateway-docker`, `ibkr-session-watchdog` |

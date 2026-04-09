@@ -1,6 +1,6 @@
 # Feature Index
 
-All 53 skills in the trading-bot-skills plugin, organized by category.
+All 59 skills in the trading-bot-skills plugin, organized by category.
 
 ---
 
@@ -104,6 +104,17 @@ All 53 skills in the trading-bot-skills plugin, organized by category.
 | Skill | Description |
 |---|---|
 | [streamlit-dashboard-patterns](../skills/streamlit-dashboard-patterns/SKILL.md) | Session state vs cache vs DB, widget clearing, live data patterns |
+
+## IBKR (Interactive Brokers)
+
+| Skill | Description |
+|---|---|
+| [ibkr-bot-architect](../skills/ibkr-bot-architect/SKILL.md) | Bot design framework: account types, permissions, sessions, API choices |
+| [ibkr-market-data-subscriptions](../skills/ibkr-market-data-subscriptions/SKILL.md) | Subscription coverage mapping, TWS-only vs API-enabled bundles |
+| [ibkr-gateway-docker](../skills/ibkr-gateway-docker/SKILL.md) | Docker deployment, port mapping, IBC configuration, ib_insync patterns |
+| [ibkr-api-edge-cases](../skills/ibkr-api-edge-cases/SKILL.md) | Order ID management, bracket orders, reconnection, historical data pacing |
+| [ibkr-risk-officer](../skills/ibkr-risk-officer/SKILL.md) | Pre-trade gatekeeper: order size, permissions, options level compliance |
+| [ibkr-session-watchdog](../skills/ibkr-session-watchdog/SKILL.md) | Diagnoses NaN quotes, session conflicts, data-line exhaustion, missing subscriptions |
 
 ## Workflow & Process
 
